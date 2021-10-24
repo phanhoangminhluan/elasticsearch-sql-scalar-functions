@@ -1,1 +1,2 @@
-# elasticsearch-sql-scalar-functions
+# Plugin Elasticsearch SQL Scalar Functions
+## Bring SQL Scalar Functions from other database engines to Elasticsearch
