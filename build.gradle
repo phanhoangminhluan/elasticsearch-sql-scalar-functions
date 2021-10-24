@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.elasticsearch.gradle:build-tools:${elasticsearchVersion}"
+
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url "https://repo1.maven.org/maven2"
+    }
+}
+
+dependencies {
+    implementation "org.antlr:antlr4:4.9.2"
+
+    implementation "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
+    implementation "org.elasticsearch.plugin:x-pack-core:${elasticsearchVersion}"
+    implementation "org.elasticsearch.plugin:elasticsearch-scripting-painless-spi:${elasticsearchVersion}"
+    implementation "org.elasticsearch.plugin:aggs-matrix-stats-client:${elasticsearchVersion}"
+    implementation "org.elasticsearch.gradle:build-tools:${elasticsearchVersion}"
+}
+
+
+apply plugin: 'elasticsearch.esplugin'
+
+esplugin {
+    name 'rich-set-scalar-functions'
+    description 'Provide more useful SQL scalar functions'
+    classname 'com.luanphm.elasticsearch.origin.sql.plugin.SqlPlugin'
+    licenseFile rootProject.file('LICENSE.txt')
+    noticeFile rootProject.file('NOTICE.txt')
+}
