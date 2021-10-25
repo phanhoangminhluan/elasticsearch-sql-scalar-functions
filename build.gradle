@@ -37,9 +37,17 @@ dependencies {
 apply plugin: 'elasticsearch.esplugin'
 
 esplugin {
-    name 'rich-set-scalar-functions'
-    description 'Provide more useful SQL scalar functions'
-    classname 'com.luanphm.elasticsearch.origin.sql.plugin.SqlPlugin'
+    name 'elasticsearch-sql-scalar-functions'
+    description 'Bring SQL Scalar Functions from multiple Database Engines to Elasticsearch'
+    classname 'com.luanphm.plugin.EsSqlScalarFunctionPlugin'
     licenseFile rootProject.file('LICENSE.txt')
     noticeFile rootProject.file('NOTICE.txt')
 }
+
+task copyZip(type: Copy) {
+    from('./build/distributions')
+    into('./plugin')
+    include('*.zip')
+}
+
+build.finalizedBy copyZip

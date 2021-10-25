@@ -110,13 +110,15 @@ public class SqlPlugin extends Plugin implements ActionPlugin {
                                              SettingsFilter settingsFilter, IndexNameExpressionResolver indexNameExpressionResolver,
                                              Supplier<DiscoveryNodes> nodesInCluster) {
 
-        return Arrays.asList(new RestSqlQueryAction(),
+        return Arrays.asList(
+                new RestSqlQueryAction(),
                 new RestSqlTranslateAction(),
                 new RestSqlClearCursorAction(),
                 new RestSqlStatsAction(),
                 new RestSqlAsyncGetResultsAction(),
                 new RestSqlAsyncGetStatusAction(),
-                new RestSqlAsyncDeleteResultsAction());
+                new RestSqlAsyncDeleteResultsAction()
+        );
     }
 
     @Override

@@ -6,6 +6,12 @@
  */
 package org.elasticsearch.xpack.sql.expression.function.scalar.string;
 
+import org.apache.commons.codec.digest.Md5Crypt;
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import static org.elasticsearch.common.Strings.hasLength;
 
 final class StringFunctionUtils {
@@ -72,5 +78,26 @@ final class StringFunctionUtils {
             i++;
         }
         return s.substring(i);
+    }
+
+    static String md5(String s) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            byte[] messageDigest = md.digest(s.getBytes());
+
+            BigInteger no = new BigInteger(1, messageDigest);
+
+            String hashtext = no.toString(16);
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+            return hashtext;
+        }
+
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
