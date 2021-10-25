@@ -1,4 +1,4 @@
-package org.elasticsearch.xpack.sql.expression.function.scalar.string.addition;
+package com.luanphm.sql.engines.spark.expression.function.scalar.string;
 
 import org.elasticsearch.xpack.ql.expression.Expression;
 import org.elasticsearch.xpack.ql.expression.function.scalar.UnaryScalarFunction;

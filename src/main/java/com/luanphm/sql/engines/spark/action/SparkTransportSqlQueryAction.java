@@ -1,6 +1,6 @@
-package com.luanphm.plugin.engines.spark;
+package com.luanphm.sql.engines.spark.action;
 
-import com.luanphm.plugin.actions.RestSql.AbstractTransportSqlQueryAction;
+import com.luanphm.sql.action.RestSql.AbstractTransportSqlQueryAction;
 import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.cluster.service.ClusterService;
 import org.elasticsearch.common.inject.Inject;

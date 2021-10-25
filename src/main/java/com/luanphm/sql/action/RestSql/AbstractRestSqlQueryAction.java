@@ -1,7 +1,7 @@
-package com.luanphm.plugin.actions.RestSql;
+package com.luanphm.sql.action.RestSql;
 
-import com.luanphm.plugin.actions.enums.DatabaseEngine;
-import com.luanphm.plugin.engines.spark.SparkSqlQueryAction;
+import com.luanphm.sql.enums.DatabaseEngine;
+import com.luanphm.sql.engines.spark.action.SparkSqlQueryAction;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.rest.BaseRestHandler;

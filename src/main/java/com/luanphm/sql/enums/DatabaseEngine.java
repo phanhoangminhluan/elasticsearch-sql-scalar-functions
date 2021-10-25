@@ -1,4 +1,4 @@
-package com.luanphm.plugin.actions.enums;
+package com.luanphm.sql.enums;
 
 /**
  * @author Minh-Luan H. Phan

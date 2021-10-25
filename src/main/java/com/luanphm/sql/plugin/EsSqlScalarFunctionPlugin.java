@@ -1,8 +1,8 @@
-package com.luanphm.plugin;
+package com.luanphm.sql.plugin;
 
-import com.luanphm.plugin.engines.spark.SparkRestSqlQueryAction;
-import com.luanphm.plugin.engines.spark.SparkSqlQueryAction;
-import com.luanphm.plugin.engines.spark.SparkTransportSqlQueryAction;
+import com.luanphm.sql.engines.spark.action.SparkRestSqlQueryAction;
+import com.luanphm.sql.engines.spark.action.SparkSqlQueryAction;
+import com.luanphm.sql.engines.spark.action.SparkTransportSqlQueryAction;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.client.Client;

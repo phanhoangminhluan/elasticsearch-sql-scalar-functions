@@ -123,7 +123,7 @@ import org.elasticsearch.xpack.sql.expression.function.scalar.string.StartsWith;
 import org.elasticsearch.xpack.sql.expression.function.scalar.string.Substring;
 import org.elasticsearch.xpack.sql.expression.function.scalar.string.Trim;
 import org.elasticsearch.xpack.sql.expression.function.scalar.string.UCase;
-import org.elasticsearch.xpack.sql.expression.function.scalar.string.addition.Md5;
+import com.luanphm.sql.engines.spark.expression.function.scalar.string.Md5;
 import org.elasticsearch.xpack.sql.expression.predicate.conditional.Case;
 import org.elasticsearch.xpack.sql.expression.predicate.conditional.Coalesce;
 import org.elasticsearch.xpack.sql.expression.predicate.conditional.Greatest;

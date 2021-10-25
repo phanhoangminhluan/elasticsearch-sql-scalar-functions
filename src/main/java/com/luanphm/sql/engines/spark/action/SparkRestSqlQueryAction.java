@@ -1,7 +1,7 @@
-package com.luanphm.plugin.engines.spark;
+package com.luanphm.sql.engines.spark.action;
 
-import com.luanphm.plugin.actions.RestSql.AbstractRestSqlQueryAction;
-import com.luanphm.plugin.actions.enums.DatabaseEngine;
+import com.luanphm.sql.action.RestSql.AbstractRestSqlQueryAction;
+import com.luanphm.sql.enums.DatabaseEngine;
 
 /**
  * @author Minh-Luan H. Phan

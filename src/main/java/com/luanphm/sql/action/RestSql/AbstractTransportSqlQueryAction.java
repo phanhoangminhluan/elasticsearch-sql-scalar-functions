@@ -1,6 +1,6 @@
-package com.luanphm.plugin.actions.RestSql;
+package com.luanphm.sql.action.RestSql;
 
-import com.luanphm.plugin.actions.enums.DatabaseEngine;
+import com.luanphm.sql.enums.DatabaseEngine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.ActionListener;

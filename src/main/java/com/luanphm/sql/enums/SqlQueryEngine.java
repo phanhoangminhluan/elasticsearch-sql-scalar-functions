@@ -1,6 +1,6 @@
-package com.luanphm.plugin.actions.enums;
+package com.luanphm.sql.enums;
 
-import com.luanphm.plugin.actions.RestSql.AbstractSqlQueryAction;
+import com.luanphm.sql.action.RestSql.AbstractSqlQueryAction;
 import org.elasticsearch.xpack.sql.proto.Protocol;
 
 /**
