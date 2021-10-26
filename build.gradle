@@ -39,7 +39,7 @@ apply plugin: 'elasticsearch.esplugin'
 esplugin {
     name 'elasticsearch-sql-scalar-functions'
     description 'Bring SQL Scalar Functions from multiple Database Engines to Elasticsearch'
-    classname 'com.luanphm.plugin.EsSqlScalarFunctionPlugin'
+    classname 'com.luanphm.sql.plugin.EsSqlScalarFunctionPlugin'
     licenseFile rootProject.file('LICENSE.txt')
     noticeFile rootProject.file('NOTICE.txt')
 }

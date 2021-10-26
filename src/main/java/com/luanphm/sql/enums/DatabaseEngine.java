@@ -2,17 +2,16 @@ package com.luanphm.sql.enums;
 
 /**
  * @author Minh-Luan H. Phan
- * Created on: 2021.10.24 22:02
+ * Created on: 2021.10.26 13:45
  */
 public enum DatabaseEngine {
 
-    SPARK("spark", SqlQueryEngine.SPARK);
+    SPARK("spark");
 
     public final String name;
-    public final SqlQueryEngine sqlQueryEngine;
 
-    DatabaseEngine(String name, SqlQueryEngine sqlQueryEngine) {
+
+    DatabaseEngine(String name) {
         this.name = name;
-        this.sqlQueryEngine = sqlQueryEngine;
     }
 }

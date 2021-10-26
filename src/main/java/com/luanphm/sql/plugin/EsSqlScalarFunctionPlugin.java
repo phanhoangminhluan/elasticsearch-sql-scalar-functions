@@ -1,8 +1,6 @@
 package com.luanphm.sql.plugin;
 
-import com.luanphm.sql.engines.spark.action.SparkRestSqlQueryAction;
-import com.luanphm.sql.engines.spark.action.SparkSqlQueryAction;
-import com.luanphm.sql.engines.spark.action.SparkTransportSqlQueryAction;
+import com.luanphm.sql.enums.ActionEngine;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.client.Client;
@@ -40,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author Minh-Luan H. Phan
@@ -109,7 +108,23 @@ public class EsSqlScalarFunctionPlugin extends Plugin implements ActionPlugin {
 
         List<RestHandler> restHandlers = new ArrayList<>();
 
-        restHandlers.add(new SparkRestSqlQueryAction());
+        /*
+         * Rest Handlers for {engine}/_sql
+         */
+        restHandlers.addAll(
+                Arrays.stream(ActionEngine.values())
+                        .map(engine -> engine.sqlQueryEngine.restHandler)
+                        .collect(Collectors.toList())
+        );
+
+        /*
+         * Rest Handlers for {engine}/_sql/close
+         */
+        restHandlers.addAll(
+                Arrays.stream(ActionEngine.values())
+                        .map(engine -> engine.sqlClearCursor.restHandler)
+                        .collect(Collectors.toList())
+        );
 
         return restHandlers;
     }
@@ -119,7 +134,23 @@ public class EsSqlScalarFunctionPlugin extends Plugin implements ActionPlugin {
 
         List<ActionHandler<? extends ActionRequest, ? extends ActionResponse>>  actionHandlers = new ArrayList<>();
 
-        actionHandlers.add(new ActionHandler<>(SparkSqlQueryAction.INSTANCE, SparkTransportSqlQueryAction.class));
+        /*
+         * Action Handlers for {engine}/_sql
+         */
+        actionHandlers.addAll(
+                Arrays.stream(ActionEngine.values())
+                        .map(engine -> new ActionHandler<>(engine.sqlQueryEngine.action, engine.sqlQueryEngine.transportActionClass))
+                        .collect(Collectors.toList())
+        );
+
+        /*
+         * Action Handlers for {engine}/_sql/close
+         */
+        actionHandlers.addAll(
+                Arrays.stream(ActionEngine.values())
+                        .map(engine -> new ActionHandler<>(engine.sqlClearCursor.action, engine.sqlClearCursor.transportActionClass))
+                        .collect(Collectors.toList())
+        );
 
         return actionHandlers;
     }
