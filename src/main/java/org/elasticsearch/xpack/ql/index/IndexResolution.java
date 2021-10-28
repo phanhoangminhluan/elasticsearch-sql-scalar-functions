@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.ql.index;
 
-import org.elasticsearch.core.Nullable;
+import org.elasticsearch.common.Nullable;
 
 import java.util.Objects;
 

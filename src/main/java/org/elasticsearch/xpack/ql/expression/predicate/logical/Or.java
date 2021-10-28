@@ -8,7 +8,6 @@ package org.elasticsearch.xpack.ql.expression.predicate.logical;
 
 import org.elasticsearch.xpack.ql.expression.Expression;
 import org.elasticsearch.xpack.ql.expression.predicate.Negatable;
-import org.elasticsearch.xpack.ql.expression.predicate.Predicates;
 import org.elasticsearch.xpack.ql.expression.predicate.logical.BinaryLogicProcessor.BinaryLogicOperation;
 import org.elasticsearch.xpack.ql.tree.NodeInfo;
 import org.elasticsearch.xpack.ql.tree.Source;
@@ -36,12 +35,6 @@ public class Or extends BinaryLogic implements Negatable<BinaryLogic> {
 
     @Override
     public And negate() {
-        return new And(source(), Not.negate(left()), Not.negate(right()));
-    }
-
-    @Override
-    protected Expression canonicalize() {
-        // NB: this add a circular dependency between Predicates / Logical package
-        return Predicates.combineOr(Predicates.splitOr(super.canonicalize()));
+        return new And(source(), new Not(source(), left()), new Not(source(), right()));
     }
 }

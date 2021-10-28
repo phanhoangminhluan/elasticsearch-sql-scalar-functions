@@ -14,8 +14,6 @@ import org.elasticsearch.xpack.ql.tree.Source;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.elasticsearch.xpack.ql.expression.Literal.NULL;
-
 /**
  * Variant of {@link Coalesce} with two args used by MySQL and ODBC.
  */
@@ -36,9 +34,6 @@ public class IfNull extends Coalesce {
 
     @Override
     protected NodeInfo<IfNull> info() {
-        List<Expression> children = children();
-        Expression first = children.size() > 0 ? children.get(0) : NULL;
-        Expression second = children.size() > 0 ? children.get(1) : NULL;
-        return NodeInfo.create(this, IfNull::new, first, second);
+        return NodeInfo.create(this, IfNull::new, children().get(0), children().get(1));
     }
 }

@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.sql.planner;
 
-import org.elasticsearch.core.Tuple;
+import org.elasticsearch.common.collect.Tuple;
 import org.elasticsearch.xpack.ql.execution.search.AggRef;
 import org.elasticsearch.xpack.ql.execution.search.FieldExtraction;
 import org.elasticsearch.xpack.ql.expression.Alias;
@@ -90,7 +90,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
@@ -125,8 +124,8 @@ class QueryFolder extends RuleExecutor<PhysicalPlan> {
                 );
 
         Batch local = new Batch("Local queries",
-                new LocalLimit(),
-                new PropagateEmptyLocal()
+                new PropagateEmptyLocal(),
+                new LocalLimit()
                 );
 
         Batch finish = new Batch("Finish query", Limiter.ONCE,
@@ -651,7 +650,7 @@ class QueryFolder extends RuleExecutor<PhysicalPlan> {
                 // COUNT(<field_name>)
                 } else if (c.distinct() == false) {
                     LeafAgg leafAgg = toAgg(functionId, f);
-                    AggPathInput a = new AggPathInput(f, new MetricAggRef(leafAgg.id(), "doc_count", "_count", null));
+                    AggPathInput a = new AggPathInput(f, new MetricAggRef(leafAgg.id(), "doc_count", "_count", false));
                     queryC = queryC.with(queryC.aggs().addAgg(leafAgg));
                     return new Tuple<>(queryC, a);
                 }
@@ -679,14 +678,14 @@ class QueryFolder extends RuleExecutor<PhysicalPlan> {
                 aggInput = new AggPathInput(f,
                         new MetricAggRef(cAggPath, ia.innerName(),
                             ia.innerKey() != null ? QueryTranslator.nameOf(ia.innerKey()) : null,
-                            ia.dataType()));
+                            isDateBased(ia.dataType())));
             }
             else {
                 LeafAgg leafAgg = toAgg(functionId, f);
                 if (f instanceof TopHits) {
                     aggInput = new AggPathInput(f, new TopHitsAggRef(leafAgg.id(), f.dataType()));
                 } else {
-                    aggInput = new AggPathInput(f, new MetricAggRef(leafAgg.id(), f.dataType()));
+                    aggInput = new AggPathInput(f, new MetricAggRef(leafAgg.id(), isDateBased(f.dataType())));
                 }
                 queryC = queryC.with(queryC.aggs().addAgg(leafAgg));
             }
@@ -702,13 +701,7 @@ class QueryFolder extends RuleExecutor<PhysicalPlan> {
                 EsQueryExec exec = (EsQueryExec) plan.child();
                 QueryContainer qContainer = exec.queryContainer();
 
-                // Reverse traversal together with the upwards fold direction ensures that sort clauses are added in reverse order of
-                // precedence. E.g. for the plan `OrderBy[a desc,b](OrderBy[a asc,c](EsExec[...]))`, `prependSort` is called with the
-                // following sequence of arguments: `c`, `a asc`, `b`, `a desc`. The resulting sort order is `a desc,b,c`.
-                ListIterator<Order> it = plan.order().listIterator(plan.order().size());
-                while (it.hasPrevious()) {
-                    Order order = it.previous();
-
+                for (Order order : plan.order()) {
                     Direction direction = Direction.from(order.direction());
                     Missing missing = Missing.from(order.nullsPosition());
 
@@ -729,26 +722,26 @@ class QueryFolder extends RuleExecutor<PhysicalPlan> {
 
                     // field
                     if (orderExpression instanceof FieldAttribute) {
-                        qContainer = qContainer.prependSort(lookup,
+                        qContainer = qContainer.addSort(lookup,
                                 new AttributeSort((FieldAttribute) orderExpression, direction, missing));
                     }
                     // scalar functions typically require script ordering
                     else if (orderExpression instanceof ScalarFunction) {
                         ScalarFunction sf = (ScalarFunction) orderExpression;
                         // nope, use scripted sorting
-                        qContainer = qContainer.prependSort(lookup, new ScriptSort(sf.asScript(), direction, missing));
+                        qContainer = qContainer.addSort(lookup, new ScriptSort(sf.asScript(), direction, missing));
                     }
                     // histogram
                     else if (orderExpression instanceof Histogram) {
-                        qContainer = qContainer.prependSort(lookup, new GroupingFunctionSort(direction, missing));
+                        qContainer = qContainer.addSort(lookup, new GroupingFunctionSort(direction, missing));
                     }
                     // score
                     else if (orderExpression instanceof Score) {
-                        qContainer = qContainer.prependSort(lookup, new ScoreSort(direction, missing));
+                        qContainer = qContainer.addSort(lookup, new ScoreSort(direction, missing));
                     }
                     // agg function
                     else if (orderExpression instanceof AggregateFunction) {
-                        qContainer = qContainer.prependSort(lookup,
+                        qContainer = qContainer.addSort(lookup,
                                 new AggregateSort((AggregateFunction) orderExpression, direction, missing));
                     }
                     // unknown

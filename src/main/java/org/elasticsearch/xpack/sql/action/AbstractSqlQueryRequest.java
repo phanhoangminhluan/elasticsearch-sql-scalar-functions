@@ -6,35 +6,50 @@
  */
 package org.elasticsearch.xpack.sql.action;
 
-import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.CompositeIndicesRequest;
+import org.elasticsearch.common.Nullable;
+import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
-import org.elasticsearch.common.xcontent.*;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.ObjectParser;
 import org.elasticsearch.common.xcontent.ObjectParser.ValueType;
+import org.elasticsearch.common.xcontent.ToXContentFragment;
+import org.elasticsearch.common.xcontent.XContentLocation;
+import org.elasticsearch.common.xcontent.XContentParseException;
+import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.XContentParser.Token;
-import org.elasticsearch.core.Nullable;
-import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.AbstractQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.xpack.sql.proto.*;
+import org.elasticsearch.xpack.sql.proto.Mode;
+import org.elasticsearch.xpack.sql.proto.Protocol;
+import org.elasticsearch.xpack.sql.proto.RequestInfo;
+import org.elasticsearch.xpack.sql.proto.SqlTypedParamValue;
+import org.elasticsearch.xpack.sql.proto.SqlVersion;
 
 import java.io.IOException;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static org.elasticsearch.Version.CURRENT;
 import static org.elasticsearch.action.ValidateActions.addValidationError;
-import static org.elasticsearch.xpack.sql.proto.Protocol.*;
+import static org.elasticsearch.xpack.sql.proto.Protocol.CLIENT_ID_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.VERSION_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.CURSOR_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.FETCH_SIZE_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.FILTER_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.MODE_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.PAGE_TIMEOUT_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.PARAMS_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.QUERY_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.REQUEST_TIMEOUT_NAME;
+import static org.elasticsearch.xpack.sql.proto.Protocol.TIME_ZONE_NAME;
 
 /**
  * Base class for requests that contain sql queries (Query and Translate)
@@ -48,8 +63,7 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
     private TimeValue pageTimeout = Protocol.PAGE_TIMEOUT;
     @Nullable
     private QueryBuilder filter = null;
-    private List<SqlTypedParamValue> params = emptyList();
-    private Map<String, Object> runtimeMappings = emptyMap();
+    private List<SqlTypedParamValue> params = Collections.emptyList();
 
     static final ParseField QUERY = new ParseField(QUERY_NAME);
     static final ParseField CURSOR = new ParseField(CURSOR_NAME);
@@ -67,8 +81,8 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
         super();
     }
 
-    public AbstractSqlQueryRequest(String query, List<SqlTypedParamValue> params, QueryBuilder filter, Map<String, Object> runtimeMappings,
-            ZoneId zoneId, int fetchSize, TimeValue requestTimeout, TimeValue pageTimeout, RequestInfo requestInfo) {
+    public AbstractSqlQueryRequest(String query, List<SqlTypedParamValue> params, QueryBuilder filter, ZoneId zoneId,
+            int fetchSize, TimeValue requestTimeout, TimeValue pageTimeout, RequestInfo requestInfo) {
         super(requestInfo);
         this.query = query;
         this.params = params;
@@ -77,7 +91,6 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
         this.requestTimeout = requestTimeout;
         this.pageTimeout = pageTimeout;
         this.filter = filter;
-        this.runtimeMappings = runtimeMappings;
     }
 
     protected static <R extends AbstractSqlQueryRequest> ObjectParser<R, Void> objectParser(Supplier<R> supplier) {
@@ -96,8 +109,8 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
         parser.declareString(
                 (request, timeout) -> request.pageTimeout(TimeValue.parseTimeValue(timeout, Protocol.PAGE_TIMEOUT, PAGE_TIMEOUT_NAME)),
                 PAGE_TIMEOUT);
-        parser.declareObject(AbstractSqlQueryRequest::filter, (p, c) -> AbstractQueryBuilder.parseInnerQueryBuilder(p), FILTER);
-        parser.declareObject(AbstractSqlQueryRequest::runtimeMappings, (p, c) -> p.map(), SearchSourceBuilder.RUNTIME_MAPPINGS_FIELD);
+        parser.declareObject(AbstractSqlQueryRequest::filter,
+                (p, c) -> AbstractQueryBuilder.parseInnerQueryBuilder(p), FILTER);
         return parser;
     }
 
@@ -229,29 +242,6 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
                     validationException);
             }
         }
-        if (runtimeMappings != null) {
-            // Perform a superficial check for runtime_mappings structure. The full check cannot happen until the actual search request
-            validationException = validateRuntimeMappings(runtimeMappings, validationException);
-        }
-        return validationException;
-    }
-
-    private static ActionRequestValidationException validateRuntimeMappings(Map<String, Object> runtimeMappings,
-        ActionRequestValidationException validationException) {
-        for (Map.Entry<String, Object> entry : runtimeMappings.entrySet()) {
-            // top level objects are fields
-            String fieldName = entry.getKey();
-            if (entry.getValue() instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> propNode = (Map<String, Object>) entry.getValue();
-                if (propNode.get("type") == null) {
-                    return addValidationError("No type specified for runtime field [" + fieldName + "]", validationException);
-                }
-            } else {
-                return addValidationError("Expected map for runtime field [" + fieldName + "] definition but got ["
-                    + fieldName.getClass().getSimpleName() + "]", validationException);
-            }
-        }
         return validationException;
     }
 
@@ -327,18 +317,6 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
         return filter;
     }
 
-    public Map<String, Object> runtimeMappings() {
-        return runtimeMappings;
-    }
-
-    /**
-     * An optional list of runtime fields that can be added to the request similar to the way it is done in Query DSL search requests
-     */
-    public AbstractSqlQueryRequest runtimeMappings(Map<String, Object> runtimeMappings) {
-        this.runtimeMappings = runtimeMappings;
-        return this;
-    }
-
     public AbstractSqlQueryRequest(StreamInput in) throws IOException {
         super(in);
         query = in.readString();
@@ -348,9 +326,6 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
         requestTimeout = in.readTimeValue();
         pageTimeout = in.readTimeValue();
         filter = in.readOptionalNamedWriteable(QueryBuilder.class);
-        if (in.getVersion().onOrAfter(Version.V_7_13_0)) {
-            runtimeMappings = in.readMap();
-        }
     }
 
     public static void writeSqlTypedParamValue(StreamOutput out, SqlTypedParamValue value) throws IOException {
@@ -376,9 +351,6 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
         out.writeTimeValue(requestTimeout);
         out.writeTimeValue(pageTimeout);
         out.writeOptionalNamedWriteable(filter);
-        if (out.getVersion().onOrAfter(Version.V_7_13_0)) {
-            out.writeMap(runtimeMappings);
-        }
     }
 
     @Override
@@ -399,12 +371,11 @@ public abstract class AbstractSqlQueryRequest extends AbstractSqlRequest impleme
                 Objects.equals(zoneId, that.zoneId) &&
                 Objects.equals(requestTimeout, that.requestTimeout) &&
                 Objects.equals(pageTimeout, that.pageTimeout) &&
-                Objects.equals(filter, that.filter) &&
-                Objects.equals(runtimeMappings, that.runtimeMappings);
+                Objects.equals(filter, that.filter);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), query, params, zoneId, fetchSize, requestTimeout, pageTimeout, filter, runtimeMappings);
+        return Objects.hash(super.hashCode(), query, params, zoneId, fetchSize, requestTimeout, pageTimeout, filter);
     }
 }

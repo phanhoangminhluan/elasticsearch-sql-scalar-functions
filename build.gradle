@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "org.elasticsearch.gradle:build-tools:${elasticsearchVersion}"
+        classpath "org.elasticsearch.gradle:build-tools:${elasticsearch_version}"
 
     }
 }
@@ -23,14 +23,48 @@ repositories {
     }
 }
 
-dependencies {
-    implementation "org.antlr:antlr4:4.9.2"
+configurations.all {
+    resolutionStrategy {
+        force 'commons-codec:commons-codec:1.12'
+        force 'org.apache.commons:commons-compress:1.5'
+        force 'org.yaml:snakeyaml:1.27'
+        force 'org.slf4j:slf4j-api:1.7.25'
+        force 'com.jcraft:jzlib:1.1.2'
+        force 'com.trilead:trilead-ssh2:1.0.0-build220'
+        force 'net.java.dev.jna:jna:4.1.0'
 
-    implementation "org.elasticsearch:elasticsearch:${elasticsearchVersion}"
-    implementation "org.elasticsearch.plugin:x-pack-core:${elasticsearchVersion}"
-    implementation "org.elasticsearch.plugin:elasticsearch-scripting-painless-spi:${elasticsearchVersion}"
-    implementation "org.elasticsearch.plugin:aggs-matrix-stats-client:${elasticsearchVersion}"
-    implementation "org.elasticsearch.gradle:build-tools:${elasticsearchVersion}"
+        force 'com.netflix.nebula:gradle-info-plugin:9.2.0'
+        force 'com.netflix.nebula:nebula-gradle-interop:1.0.11'
+
+        force 'com.fasterxml.jackson.core:jackson-core:2.10.4'
+        force 'com.fasterxml.jackson.core:jackson-databind:2.10.4'
+        force 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.4'
+        force 'com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.10.4'
+        force 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.10.4'
+        force 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.10.4'
+        force 'com.fasterxml.jackson.core:jackson-annotations:2.10.4'
+
+    }
+}
+
+dependencies {
+    implementation "org.antlr:antlr4:4.5.3"
+//    implementation "org.antlr:antlr4-runtime:4.5.3"
+
+    implementation "org.elasticsearch:elasticsearch:${elasticsearch_version}"
+    implementation "org.elasticsearch:elasticsearch-core:${elasticsearch_version}"
+    implementation "org.elasticsearch.plugin:x-pack-core:${elasticsearch_version}"
+    implementation "org.elasticsearch.plugin:elasticsearch-scripting-painless-spi:${elasticsearch_version}"
+    implementation "org.elasticsearch.plugin:aggs-matrix-stats-client:${elasticsearch_version}"
+    implementation ("org.elasticsearch.gradle:build-tools:${elasticsearch_version}") {
+        exclude group: 'org.apache.rat', module: 'apache-rat'
+        exclude group: 'net.java.dev.jna', module: 'jna'
+        exclude group: 'com.jcraft', module: 'jsch.agentproxy.connector-factory'
+        exclude group: 'org.antlr', module: 'antlr-runtime'
+//        exclude group: 'org.apache.rat', module: 'apache-rat-tasks'
+//        exclude group: 'org.apache.rat', module: 'apache-rat-core'
+    }
+
 }
 
 
@@ -44,10 +78,16 @@ esplugin {
     noticeFile rootProject.file('NOTICE.txt')
 }
 
+validateNebulaPom.enabled = false
+
 task copyZip(type: Copy) {
     from('./build/distributions')
     into('./plugin')
     include('*.zip')
+}
+
+task wrapperFile(type: Wrapper) {
+    gradleVersion = '6.9.1' //version required
 }
 
 build.finalizedBy copyZip

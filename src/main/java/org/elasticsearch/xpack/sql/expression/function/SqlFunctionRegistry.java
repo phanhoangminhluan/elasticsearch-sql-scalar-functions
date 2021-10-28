@@ -123,7 +123,6 @@ import org.elasticsearch.xpack.sql.expression.function.scalar.string.StartsWith;
 import org.elasticsearch.xpack.sql.expression.function.scalar.string.Substring;
 import org.elasticsearch.xpack.sql.expression.function.scalar.string.Trim;
 import org.elasticsearch.xpack.sql.expression.function.scalar.string.UCase;
-import com.luanphm.sql.engines.spark.expression.function.scalar.string.Md5;
 import org.elasticsearch.xpack.sql.expression.predicate.conditional.Case;
 import org.elasticsearch.xpack.sql.expression.predicate.conditional.Coalesce;
 import org.elasticsearch.xpack.sql.expression.predicate.conditional.Greatest;
@@ -184,7 +183,7 @@ public class SqlFunctionRegistry extends FunctionRegistry {
                 def(Case.class, Case::new, "CASE"),
                 def(Coalesce.class, Coalesce::new, "COALESCE"),
                 def(Iif.class, Iif::new, "IIF"),
-                def(IfNull.class, (BinaryBuilder<IfNull>) IfNull::new, "IFNULL", "ISNULL", "NVL"),
+                def(IfNull.class, IfNull::new, "IFNULL", "ISNULL", "NVL"),
                 def(NullIf.class, NullIf::new, "NULLIF"),
                 def(Greatest.class, Greatest::new, "GREATEST"),
                 def(Least.class, Least::new, "LEAST")
@@ -276,8 +275,7 @@ public class SqlFunctionRegistry extends FunctionRegistry {
                 def(StartsWith.class, StartsWith::new, "STARTS_WITH"),
                 def(Substring.class, Substring::new, "SUBSTRING"),
                 def(Trim.class, Trim::new, "TRIM"),
-                def(UCase.class, UCase::new, "UCASE", "UPPER"),
-                def(Md5.class, Md5::new, "MD5")
+                def(UCase.class, UCase::new, "UCASE", "UPPER")
             },
             // DataType conversion
             new FunctionDefinition[]{

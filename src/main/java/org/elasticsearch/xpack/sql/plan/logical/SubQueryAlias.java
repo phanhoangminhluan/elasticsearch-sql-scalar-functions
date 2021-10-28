@@ -33,7 +33,7 @@ public class SubQueryAlias extends UnaryPlan {
     }
 
     @Override
-    public SubQueryAlias replaceChild(LogicalPlan newChild) {
+    protected SubQueryAlias replaceChild(LogicalPlan newChild) {
         return new SubQueryAlias(source(), newChild, alias);
     }
 

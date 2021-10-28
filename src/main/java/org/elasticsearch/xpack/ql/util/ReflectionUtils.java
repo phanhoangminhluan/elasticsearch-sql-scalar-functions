@@ -30,7 +30,7 @@ public class ReflectionUtils {
                 if (tp instanceof Class<?>) {
                     return (Class<E>) tp;
                 } else if (tp instanceof ParameterizedType) {
-                    Type rawType = ((ParameterizedType) tp).getRawType();
+                    Type rawType = ((ParameterizedType) type).getRawType();
                     if (rawType instanceof Class<?>) {
                         return (Class<E>) rawType;
                     }

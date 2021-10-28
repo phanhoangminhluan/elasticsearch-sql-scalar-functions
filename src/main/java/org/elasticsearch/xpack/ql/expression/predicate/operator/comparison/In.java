@@ -23,14 +23,12 @@ import org.elasticsearch.xpack.ql.util.CollectionUtils;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.common.logging.LoggerMessageFormat.format;
-import static org.elasticsearch.xpack.ql.expression.TypeResolutions.ParamOrdinal.DEFAULT;
 import static org.elasticsearch.xpack.ql.expression.gen.script.ParamsBuilder.paramsBuilder;
 import static org.elasticsearch.xpack.ql.util.StringUtils.ordinal;
 
@@ -99,14 +97,6 @@ public class In extends ScalarFunction {
     }
 
     @Override
-    protected Expression canonicalize() {
-        // order values for commutative operators
-        List<Expression> canonicalValues = Expressions.canonicalize(list);
-        Collections.sort(canonicalValues, (l, r) -> Integer.compare(l.hashCode(), r.hashCode()));
-        return new In(source(), value, canonicalValues, zoneId);
-    }
-
-    @Override
     public ScriptTemplate asScript() {
         ScriptTemplate leftScript = asScript(value);
 
@@ -141,7 +131,7 @@ public class In extends ScalarFunction {
 
     @Override
     protected TypeResolution resolveType() {
-        TypeResolution resolution = TypeResolutions.isExact(value, functionName(), DEFAULT);
+        TypeResolution resolution = TypeResolutions.isExact(value, functionName(), Expressions.ParamOrdinal.DEFAULT);
         if (resolution.unresolved()) {
             return resolution;
         }

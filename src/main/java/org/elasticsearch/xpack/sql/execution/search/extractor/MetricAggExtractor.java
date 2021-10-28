@@ -6,8 +6,6 @@
  */
 package org.elasticsearch.xpack.sql.execution.search.extractor;
 
-import org.elasticsearch.Version;
-import org.elasticsearch.core.Nullable;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.search.aggregations.InternalAggregation;
@@ -24,11 +22,9 @@ import org.elasticsearch.search.aggregations.metrics.InternalSum;
 import org.elasticsearch.search.aggregations.metrics.InternalTDigestPercentileRanks;
 import org.elasticsearch.search.aggregations.metrics.InternalTDigestPercentiles;
 import org.elasticsearch.xpack.ql.execution.search.extractor.BucketExtractor;
-import org.elasticsearch.xpack.ql.type.DataType;
 import org.elasticsearch.xpack.sql.SqlIllegalArgumentException;
 import org.elasticsearch.xpack.sql.common.io.SqlStreamInput;
 import org.elasticsearch.xpack.sql.querydsl.agg.Aggs;
-import org.elasticsearch.xpack.sql.type.SqlDataTypes;
 import org.elasticsearch.xpack.sql.util.DateUtils;
 import java.io.IOException;
 import java.time.ZoneId;
@@ -37,9 +33,6 @@ import java.util.Objects;
 
 import static org.elasticsearch.search.aggregations.matrix.stats.MatrixAggregationInspectionHelper.hasValue;
 import static org.elasticsearch.search.aggregations.support.AggregationInspectionHelper.hasValue;
-import static org.elasticsearch.xpack.ql.type.DataTypes.DATETIME;
-import static org.elasticsearch.xpack.sql.type.SqlDataTypeConverter.convert;
-import static org.elasticsearch.xpack.sql.type.SqlDataTypes.isDateBased;
 
 public class MetricAggExtractor implements BucketExtractor {
 
@@ -48,35 +41,23 @@ public class MetricAggExtractor implements BucketExtractor {
     private final String name;
     private final String property;
     private final String innerKey;
-    private final DataType dataType;
+    private final boolean isDateTimeBased;
     private final ZoneId zoneId;
 
-    public MetricAggExtractor(String name, String property, String innerKey, ZoneId zoneId, @Nullable DataType dataType) {
+    public MetricAggExtractor(String name, String property, String innerKey, ZoneId zoneId, boolean isDateTimeBased) {
         this.name = name;
         this.property = property;
         this.innerKey = innerKey;
+        this.isDateTimeBased = isDateTimeBased;
         this.zoneId = zoneId;
-        this.dataType = dataType;
-    }
-
-    public MetricAggExtractor(String name, String property, String innerKey, ZoneId zoneId) {
-        this(name, property, innerKey, zoneId, null);
     }
 
     MetricAggExtractor(StreamInput in) throws IOException {
         name = in.readString();
         property = in.readString();
         innerKey = in.readOptionalString();
-        if (in.getVersion().onOrAfter(Version.V_7_13_0)) {
-            String typeName = in.readOptionalString();
-            if (typeName != null) {
-                dataType = SqlDataTypes.fromTypeName(typeName);
-            } else {
-                dataType = null;
-            }
-        } else {
-            dataType = in.readBoolean() ? DATETIME : null;
-        }
+        isDateTimeBased = in.readBoolean();
+
         zoneId = SqlStreamInput.asSqlStream(in).zoneId();
     }
 
@@ -85,11 +66,7 @@ public class MetricAggExtractor implements BucketExtractor {
         out.writeString(name);
         out.writeString(property);
         out.writeOptionalString(innerKey);
-        if (out.getVersion().onOrAfter(Version.V_7_13_0)) {
-            out.writeOptionalString(dataType == null ? null : dataType.name());
-        } else {
-            out.writeBoolean(isDateBased(dataType));
-        }
+        out.writeBoolean(isDateTimeBased);
     }
 
     String name() {
@@ -129,7 +106,7 @@ public class MetricAggExtractor implements BucketExtractor {
             //if (innerKey == null) {
             //    throw new SqlIllegalArgumentException("Invalid innerKey {} specified for aggregation {}", innerKey, name);
             //}
-            return handleTargetType(((InternalNumericMetricsAggregation.MultiValue) agg).value(property));
+            return handleDateTime(((InternalNumericMetricsAggregation.MultiValue) agg).value(property));
         } else if (agg instanceof InternalFilter) {
             // COUNT(expr) and COUNT(ALL expr) uses this type of aggregation to account for non-null values only
             return ((InternalFilter) agg).getDocCount();
@@ -138,17 +115,17 @@ public class MetricAggExtractor implements BucketExtractor {
         }
 
         Object v = agg.getProperty(property);
-        return handleTargetType(innerKey != null && v instanceof Map ? ((Map<?, ?>) v).get(innerKey) : v);
+        return handleDateTime(innerKey != null && v instanceof Map ? ((Map<?, ?>) v).get(innerKey) : v);
     }
 
-    private Object handleTargetType(Object object) {
-        if (object instanceof Number && dataType != null) {
-            if (isDateBased(dataType)) {
+    private Object handleDateTime(Object object) {
+        if (isDateTimeBased) {
+            if (object == null) {
+                return object;
+            } else if (object instanceof Number) {
                 return DateUtils.asDateTimeWithMillis(((Number) object).longValue(), zoneId);
-            } else if (dataType.isInteger()) {
-                // MIN and MAX need to return the same type as field's and SUM a long for integral types, but ES returns them always as
-                // floating points -> convert them in the the SELECT pipeline, if needed
-                return convert(object, dataType);
+            } else {
+                throw new SqlIllegalArgumentException("Invalid date key returned: {}", object);
             }
         }
         return object;

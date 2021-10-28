@@ -31,4 +31,8 @@ public class IsoWeekOfYear extends DateTimeFunction {
         return new IsoWeekOfYear(source(), newChild, zoneId());
     }
 
+    @Override
+    public String dateTimeFormat() {
+        return "w";
+    }
 }

@@ -7,7 +7,6 @@
 package org.elasticsearch.xpack.sql.querydsl.container;
 
 import org.elasticsearch.xpack.ql.execution.search.AggRef;
-import org.elasticsearch.xpack.ql.type.DataType;
 import org.elasticsearch.xpack.sql.querydsl.agg.Aggs;
 
 /**
@@ -19,21 +18,21 @@ public class MetricAggRef extends AggRef {
     private final String name;
     private final String property;
     private final String innerKey;
-    private final DataType dataType;
+    private final boolean isDateTimeBased;
 
-    public MetricAggRef(String name, DataType dataType) {
-        this(name, "value", dataType);
+    public MetricAggRef(String name, boolean isDateTimeBased) {
+        this(name, "value", isDateTimeBased);
     }
 
-    public MetricAggRef(String name, String property, DataType dataType) {
-        this(name, property, null, dataType);
+    public MetricAggRef(String name, String property, boolean isDateTimeBased) {
+        this(name, property, null, isDateTimeBased);
     }
 
-    public MetricAggRef(String name, String property, String innerKey, DataType dataType) {
+    public MetricAggRef(String name, String property, String innerKey, boolean isDateTimeBased) {
         this.name = name;
         this.property = property;
         this.innerKey = innerKey;
-        this.dataType = dataType;
+        this.isDateTimeBased = isDateTimeBased;
     }
 
     public String name() {
@@ -48,8 +47,8 @@ public class MetricAggRef extends AggRef {
         return innerKey;
     }
 
-    public DataType dataType() {
-        return dataType;
+    public boolean isDateTimeBased() {
+        return isDateTimeBased;
     }
 
     @Override

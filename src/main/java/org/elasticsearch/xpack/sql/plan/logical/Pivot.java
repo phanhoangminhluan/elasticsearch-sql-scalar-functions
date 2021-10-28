@@ -74,7 +74,7 @@ public class Pivot extends UnaryPlan {
     }
 
     @Override
-    public Pivot replaceChild(LogicalPlan newChild) {
+    protected Pivot replaceChild(LogicalPlan newChild) {
         return new Pivot(source(), newChild, column, values, aggregates, grouping);
     }
 

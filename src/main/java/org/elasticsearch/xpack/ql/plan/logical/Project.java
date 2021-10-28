@@ -35,7 +35,7 @@ public class Project extends UnaryPlan {
     }
 
     @Override
-    public Project replaceChild(LogicalPlan newChild) {
+    protected Project replaceChild(LogicalPlan newChild) {
         return new Project(source(), newChild, projections);
     }
 

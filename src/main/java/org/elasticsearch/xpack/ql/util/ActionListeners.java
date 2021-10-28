@@ -8,8 +8,8 @@
 package org.elasticsearch.xpack.ql.util;
 
 import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.core.CheckedConsumer;
-import org.elasticsearch.core.CheckedFunction;
+import org.elasticsearch.common.CheckedConsumer;
+import org.elasticsearch.common.CheckedFunction;
 
 import java.util.function.Consumer;
 

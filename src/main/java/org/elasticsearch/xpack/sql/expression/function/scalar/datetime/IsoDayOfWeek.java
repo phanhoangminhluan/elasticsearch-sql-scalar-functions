@@ -31,4 +31,8 @@ public class IsoDayOfWeek extends DateTimeFunction {
         return new IsoDayOfWeek(source(), newChild, zoneId());
     }
 
+    @Override
+    public String dateTimeFormat() {
+        return "e";
+    }
 }

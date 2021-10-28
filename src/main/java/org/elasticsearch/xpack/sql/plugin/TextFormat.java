@@ -7,7 +7,7 @@
 package org.elasticsearch.xpack.sql.plugin;
 
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.core.Tuple;
+import org.elasticsearch.common.collect.Tuple;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.xpack.ql.util.StringUtils;
 import org.elasticsearch.xpack.sql.SqlIllegalArgumentException;
@@ -34,7 +34,7 @@ import static org.elasticsearch.xpack.sql.proto.Protocol.URL_PARAM_DELIMITER;
 /**
  * Templating class for displaying SQL responses in text formats.
  */
-enum TextFormat {
+public enum TextFormat {
 
     /**
      * Default text writer.
@@ -46,7 +46,7 @@ enum TextFormat {
      */
     PLAIN_TEXT() {
         @Override
-        String format(RestRequest request, SqlQueryResponse response) {
+        public String format(RestRequest request, SqlQueryResponse response) {
             BasicFormatter formatter = null;
             Cursor cursor = null;
             ZoneId zoneId = null;
@@ -71,12 +71,13 @@ enum TextFormat {
                 }
                 // format with header
                 return formatter.formatWithHeader(response.columns(), response.rows());
-            } else if (formatter != null) { // should be initialized (wrapped by the cursor)
-                // format without header
-                return formatter.formatWithoutHeader(response.rows());
-            } else if (response.hasId()) {
-                // an async request has no results yet
-                return StringUtils.EMPTY;
+            }
+            else {
+                // should be initialized (wrapped by the cursor)
+                if (formatter != null) {
+                    // format without header
+                    return formatter.formatWithoutHeader(response.rows());
+                }
             }
             // if this code is reached, it means it's a next page without cursor wrapping
             throw new SqlIllegalArgumentException("Cannot find text formatter - this is likely a bug");
@@ -135,7 +136,7 @@ enum TextFormat {
         }
 
         @Override
-        String contentType(RestRequest request) {
+        public String contentType(RestRequest request) {
             return contentType() + "; charset=utf-8; " +
                 URL_PARAM_HEADER + "=" + (hasHeader(request) ? PARAM_HEADER_PRESENT : PARAM_HEADER_ABSENT);
         }
@@ -244,7 +245,7 @@ enum TextFormat {
         }
 
         @Override
-        String contentType(RestRequest request) {
+        public String contentType(RestRequest request) {
             return contentType() + "; charset=utf-8";
         }
 
@@ -280,7 +281,7 @@ enum TextFormat {
     private static final String PARAM_HEADER_ABSENT = "absent";
     private static final String PARAM_HEADER_PRESENT = "present";
 
-    String format(RestRequest request, SqlQueryResponse response) {
+    public String format(RestRequest request, SqlQueryResponse response) {
         StringBuilder sb = new StringBuilder();
 
         // if the header is requested (and the column info is present - namely it's the first page) return the info
@@ -300,7 +301,7 @@ enum TextFormat {
         return true;
     }
 
-    static TextFormat fromMediaTypeOrFormat(String accept) {
+    public static TextFormat fromMediaTypeOrFormat(String accept) {
         for (TextFormat text : values()) {
             String contentType = text.contentType();
             if (contentType.equalsIgnoreCase(accept)
@@ -330,7 +331,7 @@ enum TextFormat {
      * Might be used by some formatters (like CSV) to specify certain metadata like
      * whether the header is returned or not.
      */
-    String contentType(RestRequest request) {
+    public String contentType(RestRequest request) {
         return contentType();
     }
 

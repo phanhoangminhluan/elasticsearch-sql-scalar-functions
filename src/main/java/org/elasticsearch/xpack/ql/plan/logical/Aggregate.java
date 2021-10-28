@@ -34,7 +34,7 @@ public class Aggregate extends UnaryPlan {
     }
 
     @Override
-    public Aggregate replaceChild(LogicalPlan newChild) {
+    protected Aggregate replaceChild(LogicalPlan newChild) {
         return new Aggregate(source(), newChild, groupings, aggregates);
     }
 

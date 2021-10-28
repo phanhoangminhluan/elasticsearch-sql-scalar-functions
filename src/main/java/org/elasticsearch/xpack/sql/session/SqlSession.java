@@ -8,9 +8,7 @@ package org.elasticsearch.xpack.sql.session;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.ParentTaskAssigningClient;
 import org.elasticsearch.common.Strings;
-import org.elasticsearch.tasks.TaskCancelledException;
 import org.elasticsearch.xpack.ql.expression.function.FunctionRegistry;
 import org.elasticsearch.xpack.ql.index.IndexResolution;
 import org.elasticsearch.xpack.ql.index.IndexResolver;
@@ -57,7 +55,7 @@ public class SqlSession implements Session {
             Optimizer optimizer,
             Planner planner,
             PlanExecutor planExecutor) {
-        this.client = configuration.taskId() != null ? new ParentTaskAssigningClient(client, configuration.taskId()) : client;
+        this.client = client;
         this.functionRegistry = functionRegistry;
 
         this.indexResolver = indexResolver;
@@ -127,11 +125,6 @@ public class SqlSession implements Session {
     }
 
     private <T> void preAnalyze(LogicalPlan parsed, Function<IndexResolution, T> action, ActionListener<T> listener) {
-        if (configuration.task() != null && configuration.task().isCancelled()) {
-            listener.onFailure(new TaskCancelledException("cancelled"));
-            return;
-        }
-
         PreAnalysis preAnalysis = preAnalyzer.preAnalyze(parsed);
         // TODO we plan to support joins in the future when possible, but for now we'll just fail early if we see one
         if (preAnalysis.indices.size() > 1) {
@@ -148,7 +141,7 @@ public class SqlSession implements Session {
             }
 
             boolean includeFrozen = configuration.includeFrozen() || tableInfo.isFrozen();
-            indexResolver.resolveAsMergedMapping(table.index(), null, includeFrozen, configuration.runtimeMappings(),
+            indexResolver.resolveAsMergedMapping(table.index(), null, includeFrozen,
                     wrap(indexResult -> listener.onResponse(action.apply(indexResult)), listener::onFailure));
         } else {
             try {

@@ -28,7 +28,7 @@ public class With extends UnaryPlan {
     }
 
     @Override
-    public With replaceChild(LogicalPlan newChild) {
+    protected With replaceChild(LogicalPlan newChild) {
         return new With(source(), newChild, subQueries);
     }
 

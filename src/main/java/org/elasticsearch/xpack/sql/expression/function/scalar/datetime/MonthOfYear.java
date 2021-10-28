@@ -31,4 +31,8 @@ public class MonthOfYear extends DateTimeFunction {
         return new MonthOfYear(source(), newChild, zoneId());
     }
 
+    @Override
+    public String dateTimeFormat() {
+        return "M";
+    }
 }

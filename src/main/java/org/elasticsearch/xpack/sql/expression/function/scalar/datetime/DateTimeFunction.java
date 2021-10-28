@@ -51,6 +51,9 @@ public abstract class DateTimeFunction extends BaseDateTimeFunction {
         return DataTypes.INTEGER;
     }
 
+    // used for applying ranges
+    public abstract String dateTimeFormat();
+
     protected DateTimeExtractor extractor() {
         return extractor;
     }

@@ -6,7 +6,7 @@
  */
 package org.elasticsearch.xpack.sql.analysis.analyzer;
 
-import org.elasticsearch.core.Tuple;
+import org.elasticsearch.common.collect.Tuple;
 import org.elasticsearch.xpack.ql.capabilities.Unresolvable;
 import org.elasticsearch.xpack.ql.common.Failure;
 import org.elasticsearch.xpack.ql.expression.Alias;
@@ -214,8 +214,6 @@ public final class Verifier {
                 checkFilterOnAggs(p, localFailures, attributeRefs);
                 checkFilterOnGrouping(p, localFailures, attributeRefs);
 
-                checkNestedAggregation(p, localFailures, attributeRefs);
-
                 if (groupingFailures.contains(p) == false) {
                     checkGroupBy(p, localFailures, attributeRefs, groupingFailures);
                 }
@@ -266,16 +264,6 @@ public final class Verifier {
         }
 
         return failures;
-    }
-
-    private void checkNestedAggregation(LogicalPlan p, Set<Failure> localFailures, AttributeMap<Expression> attributeRefs) {
-        if (p instanceof Aggregate) {
-            ((Aggregate) p).child()
-                .forEachDown(
-                    Aggregate.class,
-                    a -> { localFailures.add(fail(a, "Nested aggregations in sub-selects are not supported.")); }
-                );
-        }
     }
 
     private void checkFullTextSearchInSelect(LogicalPlan plan, Set<Failure> localFailures) {
@@ -683,18 +671,32 @@ public final class Verifier {
     private static void checkFilterOnAggs(LogicalPlan p, Set<Failure> localFailures, AttributeMap<Expression> attributeRefs) {
         if (p instanceof Filter) {
             Filter filter = (Filter) p;
-            if (filter.anyMatch(Aggregate.class::isInstance) == false) {
+            LogicalPlan filterChild = filter.child();
+            if (filterChild instanceof Aggregate == false) {
                 filter.condition().forEachDown(Expression.class, e -> {
                     if (Functions.isAggregate(attributeRefs.resolve(e, e))) {
-                        if (filter.child() instanceof Project) {
+                        if (filterChild instanceof Project) {
                             filter.condition().forEachDown(FieldAttribute.class,
                                 f -> localFailures.add(fail(e, "[{}] field must appear in the GROUP BY clause or in an aggregate function",
                                         Expressions.name(f)))
                             );
+                            Set<Expression> unsupported = new LinkedHashSet<>();
+                            filter.condition().forEachDown(ReferenceAttribute.class,
+                                f -> {
+                                    Expression t = attributeRefs.resolve(f, f);
+                                    if (t instanceof TopHits) {
+                                        unsupported.add(t);
+                                    }
+                                });
+                            if (unsupported.isEmpty() == false) {
+                                String plural = unsupported.size() > 1 ? "s" : StringUtils.EMPTY;
+                                localFailures.add(
+                                    fail(filter.condition(), "filtering is unsupported for function" + plural + " {}",
+                                        Expressions.names(unsupported)));
+                            }
                         } else {
                             localFailures.add(fail(e, "Cannot use WHERE filtering on aggregate function [{}], use HAVING instead",
                                 Expressions.name(e)));
-
                         }
                     }
                 });
@@ -731,12 +733,11 @@ public final class Verifier {
 
 
     private static void checkForScoreInsideFunctions(LogicalPlan p, Set<Failure> localFailures) {
-        // Make sure that SCORE is only used as a "top level" function
+        // Make sure that SCORE is only used in "top level" functions
         p.forEachExpression(Function.class, f ->
             f.arguments().stream()
                 .filter(exp -> exp.anyMatch(Score.class::isInstance))
-                .forEach(exp -> localFailures.add(fail(exp,
-                    "[SCORE()] cannot be used in expressions, does not support further processing")))
+                .forEach(exp -> localFailures.add(fail(exp, "[SCORE()] cannot be an argument to a function")))
         );
     }
 

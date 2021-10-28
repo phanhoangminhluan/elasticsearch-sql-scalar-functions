@@ -7,7 +7,11 @@
 
 package org.elasticsearch.xpack.sql.proto;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
 
 public class RequestInfo {
     private static final String CANVAS = "canvas";

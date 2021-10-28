@@ -23,7 +23,7 @@ public class Distinct extends UnaryPlan {
     }
 
     @Override
-    public Distinct replaceChild(LogicalPlan newChild) {
+    protected Distinct replaceChild(LogicalPlan newChild) {
         return new Distinct(source(), newChild);
     }
 

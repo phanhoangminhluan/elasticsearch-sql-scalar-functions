@@ -44,9 +44,4 @@ public class NotEquals extends BinaryComparison implements Negatable<BinaryCompa
     public BinaryComparison reverse() {
         return this;
     }
-
-    @Override
-    protected boolean isCommutative() {
-        return true;
-    }
 }

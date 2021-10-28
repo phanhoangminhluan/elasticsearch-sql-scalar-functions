@@ -6,7 +6,6 @@ import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.cluster.service.ClusterService;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.util.BigArrays;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
 import org.elasticsearch.xpack.sql.execution.PlanExecutor;
@@ -28,8 +27,7 @@ public class SparkTransportSqlQueryAction extends AbstractTransportSqlQueryActio
             ThreadPool threadPool,
             ActionFilters actionFilters,
             PlanExecutor planExecutor,
-            SqlLicenseChecker sqlLicenseChecker,
-            BigArrays bigArrays
+            SqlLicenseChecker sqlLicenseChecker
     ) {
         super(
                 SparkTransportSqlQueryAction.ACTION_ENGINE,
@@ -39,8 +37,7 @@ public class SparkTransportSqlQueryAction extends AbstractTransportSqlQueryActio
                 threadPool,
                 actionFilters,
                 planExecutor,
-                sqlLicenseChecker,
-                bigArrays
+                sqlLicenseChecker
         );
     }
 

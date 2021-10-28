@@ -14,7 +14,6 @@ import org.elasticsearch.xpack.ql.type.DataType;
 import org.elasticsearch.xpack.ql.type.DataTypes;
 import org.elasticsearch.xpack.sql.expression.function.scalar.string.BinaryStringNumericProcessor.BinaryStringNumericOperation;
 
-import static org.elasticsearch.xpack.ql.expression.TypeResolutions.ParamOrdinal.SECOND;
 import static org.elasticsearch.xpack.ql.expression.TypeResolutions.isNumeric;
 
 /**
@@ -31,7 +30,7 @@ public abstract class BinaryStringNumericFunction extends BinaryStringFunction<N
 
     @Override
     protected TypeResolution resolveSecondParameterInputType(Expression e) {
-        return isNumeric(e, sourceText(), SECOND);
+        return isNumeric(e, sourceText(), Expressions.ParamOrdinal.SECOND);
     }
 
     @Override

@@ -68,12 +68,7 @@ public class Literal extends LeafExpression {
 
     @Override
     public int hashCode() {
-        return Objects.hash(dataType, value);
-    }
-
-    @Override
-    protected Expression canonicalize() {
-        return this;
+        return Objects.hash(value, dataType);
     }
 
     @Override

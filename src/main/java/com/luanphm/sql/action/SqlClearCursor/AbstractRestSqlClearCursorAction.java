@@ -8,7 +8,6 @@ import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.RestToXContentListener;
 import org.elasticsearch.xpack.sql.action.SqlClearCursorAction;
 import org.elasticsearch.xpack.sql.action.SqlClearCursorRequest;
-import org.elasticsearch.xpack.sql.proto.Protocol;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -27,13 +26,14 @@ public abstract class AbstractRestSqlClearCursorAction extends BaseRestHandler {
     @Override
     public List<Route> routes() {
         return Collections.unmodifiableList(Arrays.asList(
-                Route.builder(RestRequest.Method.GET, getDatabaseEngine().sqlClearCursor.endpoint).build(),
-                Route.builder(RestRequest.Method.POST, getDatabaseEngine().sqlClearCursor.endpoint).build()
+                new Route(RestRequest.Method.GET, getDatabaseEngine().sqlClearCursor.endpoint),
+                new Route(RestRequest.Method.POST, getDatabaseEngine().sqlClearCursor.endpoint)
         ));
     }
 
     @Override
-    protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
+    protected RestChannelConsumer prepareRequest(RestRequest request, NodeClient client)
+            throws IOException {
         SqlClearCursorRequest sqlRequest;
         try (XContentParser parser = request.contentParser()) {
             sqlRequest = SqlClearCursorRequest.fromXContent(parser);

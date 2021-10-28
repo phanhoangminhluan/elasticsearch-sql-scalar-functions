@@ -29,7 +29,7 @@ public class Having extends Filter {
     }
 
     @Override
-    public Having replaceChild(LogicalPlan newChild) {
+    protected Having replaceChild(LogicalPlan newChild) {
         return new Having(source(), newChild, condition());
     }
 

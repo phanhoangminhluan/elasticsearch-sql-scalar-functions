@@ -32,4 +32,8 @@ public class DayOfYear extends DateTimeFunction {
         return new DayOfYear(source(), newChild, zoneId());
     }
 
+    @Override
+    public String dateTimeFormat() {
+        return "D";
+    }
 }
