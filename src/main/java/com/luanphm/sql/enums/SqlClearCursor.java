@@ -6,6 +6,10 @@ import com.luanphm.sql.action.SqlClearCursor.AbstractTransportSqlClearCursorActi
 import com.luanphm.sql.engines.spark.action.SqlClearCursor.SparkRestSqlClearCursorAction;
 import com.luanphm.sql.engines.spark.action.SqlClearCursor.SparkSqlClearCursorAction;
 import com.luanphm.sql.engines.spark.action.SqlClearCursor.SparkTransportSqlClearCursorAction;
+import org.elasticsearch.plugins.ActionPlugin;
+import org.elasticsearch.xpack.sql.action.SqlClearCursorRequest;
+import org.elasticsearch.xpack.sql.action.SqlClearCursorResponse;
+import org.elasticsearch.xpack.sql.execution.PlanExecutor;
 import org.elasticsearch.xpack.sql.proto.Protocol;
 
 /**
@@ -25,14 +29,16 @@ public enum SqlClearCursor {
     public final String endpoint;
     public final AbstractSqlClearCursorAction action;
     public final AbstractRestSqlClearCursorAction restHandler;
-    public final Class<? extends AbstractTransportSqlClearCursorAction> transportActionClass;
+    public final Class<? extends AbstractTransportSqlClearCursorAction<? extends PlanExecutor>> transportActionClass;
+    public final ActionPlugin.ActionHandler<SqlClearCursorRequest, SqlClearCursorResponse> actionHandler;
 
 
-    SqlClearCursor(String engine, AbstractSqlClearCursorAction action, AbstractRestSqlClearCursorAction restHandler, Class<? extends AbstractTransportSqlClearCursorAction> transportActionClass) {
+    SqlClearCursor(String engine, AbstractSqlClearCursorAction action, AbstractRestSqlClearCursorAction restHandler, Class<? extends AbstractTransportSqlClearCursorAction<? extends PlanExecutor>> transportActionClass) {
         this.actionName = String.format(engine, AbstractSqlClearCursorAction.FORMAT_NAME);
         this.endpoint = "/" + engine + Protocol.CLEAR_CURSOR_REST_ENDPOINT;
         this.action = action;
         this.restHandler = restHandler;
         this.transportActionClass = transportActionClass;
+        this.actionHandler = new ActionPlugin.ActionHandler<>(action, transportActionClass);
     }
 }

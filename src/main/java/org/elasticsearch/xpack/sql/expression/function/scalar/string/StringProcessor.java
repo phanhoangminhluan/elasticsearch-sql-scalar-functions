@@ -6,6 +6,7 @@
  */
 package org.elasticsearch.xpack.sql.expression.function.scalar.string;
 
+import com.luanphm.sql.engines.spark.expression.function.scalar.string.AdditionalStringFunctionUtils;
 import org.apache.lucene.util.UnicodeUtil;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -68,7 +69,11 @@ public class StringProcessor implements Processor {
         }),
         BIT_LENGTH((String s) -> UnicodeUtil.calcUTF16toUTF8Length(s, 0, s.length()) * 8),
         OCTET_LENGTH((String s) -> UnicodeUtil.calcUTF16toUTF8Length(s, 0, s.length())),
-        CHAR_LENGTH(String::length);
+        CHAR_LENGTH(String::length),
+
+        // Custom
+        MD5(AdditionalStringFunctionUtils::md5)
+        ;
 
         private final Function<Object, Object> apply;
 

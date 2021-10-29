@@ -24,7 +24,7 @@ import static java.util.Collections.emptyMap;
  * @author Minh-Luan H. Phan
  * Created on: 2021.10.26 13:53
  */
-public class AbstractTransportSqlClearCursorAction extends HandledTransportAction<SqlClearCursorRequest, SqlClearCursorResponse> {
+public class AbstractTransportSqlClearCursorAction<T extends PlanExecutor> extends HandledTransportAction<SqlClearCursorRequest, SqlClearCursorResponse> {
     private final PlanExecutor planExecutor;
     private final SqlLicenseChecker sqlLicenseChecker;
 
@@ -32,7 +32,7 @@ public class AbstractTransportSqlClearCursorAction extends HandledTransportActio
     public AbstractTransportSqlClearCursorAction(ActionEngine actionEngine,
                                                  TransportService transportService,
                                                  ActionFilters actionFilters,
-                                                 PlanExecutor planExecutor,
+                                                 T planExecutor,
                                                  SqlLicenseChecker sqlLicenseChecker
     ) {
         super(actionEngine.sqlClearCursor.actionName, transportService, actionFilters, SqlClearCursorRequest::new);

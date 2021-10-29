@@ -8,6 +8,7 @@ package org.elasticsearch.xpack.sql.execution;
 
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.xpack.ql.expression.function.FunctionRegistry;
@@ -63,6 +64,20 @@ public class PlanExecutor {
         this.planner = new Planner();
     }
 
+    public PlanExecutor(Client client, IndexResolver indexResolver, NamedWriteableRegistry writeableRegistry, SqlFunctionRegistry sqlFunctionRegistry) {
+        this.client = client;
+        this.writableRegistry = writeableRegistry;
+
+        this.indexResolver = indexResolver;
+        this.functionRegistry = sqlFunctionRegistry;
+
+        this.metrics = new Metrics();
+
+        this.preAnalyzer = new PreAnalyzer();
+        this.verifier = new Verifier(metrics);
+        this.optimizer = new Optimizer();
+        this.planner = new Planner();
+    }
     private SqlSession newSession(SqlConfiguration cfg) {
         return new SqlSession(cfg, client, functionRegistry, indexResolver, preAnalyzer, verifier, optimizer, planner, this);
     }

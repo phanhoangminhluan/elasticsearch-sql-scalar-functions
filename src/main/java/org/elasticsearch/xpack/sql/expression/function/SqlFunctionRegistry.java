@@ -148,7 +148,7 @@ public class SqlFunctionRegistry extends FunctionRegistry {
         register(functions);
     }
 
-    private FunctionDefinition[][] functions() {
+    protected FunctionDefinition[][] functions() {
         return new FunctionDefinition[][]{
             // Aggregate functions
             new FunctionDefinition[]{

@@ -44,7 +44,7 @@ import static org.elasticsearch.xpack.sql.proto.Mode.CLI;
  * @author Minh-Luan H. Phan
  * Created on: 2021.10.24 21:36
  */
-public abstract class AbstractTransportSqlQueryAction  extends HandledTransportAction<SqlQueryRequest, SqlQueryResponse> {
+public abstract class AbstractTransportSqlQueryAction<T extends PlanExecutor>  extends HandledTransportAction<SqlQueryRequest, SqlQueryResponse> {
 
     private static final Logger log = LogManager.getLogger(AbstractTransportSqlQueryAction.class);
 
@@ -60,7 +60,7 @@ public abstract class AbstractTransportSqlQueryAction  extends HandledTransportA
                                            TransportService transportService,
                                            ThreadPool threadPool,
                                            ActionFilters actionFilters,
-                                           PlanExecutor planExecutor,
+                                           T planExecutor,
                                            SqlLicenseChecker sqlLicenseChecker
     ) {
         super(actionEngine.sqlQueryEngine.actionName, transportService, actionFilters, SqlQueryRequest::new);
