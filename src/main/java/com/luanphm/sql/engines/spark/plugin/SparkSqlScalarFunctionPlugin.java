@@ -1,9 +1,7 @@
 package com.luanphm.sql.engines.spark.plugin;
 
-import com.luanphm.sql.engines.spark.execution.SparkSqlPlanExecutor;
 import com.luanphm.sql.enums.ActionEngine;
 import com.luanphm.sql.plugin.AbstractSqlScalarFunctionPlugin;
-import com.luanphm.sql.util.StackTraceUtil;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.client.Client;
@@ -67,7 +65,6 @@ public final class SparkSqlScalarFunctionPlugin extends AbstractSqlScalarFunctio
 
     @Override
     public PlanExecutor getPlanExecutor(Client client, IndexResolver indexResolver, NamedWriteableRegistry namedWriteableRegistry) {
-        StackTraceUtil.printStackTrace("get plan executor");
         return ACTION_ENGINE.planExecutor.apply(client, indexResolver, namedWriteableRegistry);
     }
 }

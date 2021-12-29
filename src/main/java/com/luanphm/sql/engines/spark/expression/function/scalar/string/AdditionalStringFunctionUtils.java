@@ -25,7 +25,6 @@ public class AdditionalStringFunctionUtils {
             return hashtext;
         }
 
-        // For specifying wrong message digest algorithms
         catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

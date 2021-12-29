@@ -1,9 +1,11 @@
 package com.luanphm.sql.engines.spark.expression.function;
 
+import com.luanphm.sql.engines.spark.expression.function.scalar.string.EnhancedConcat;
 import com.luanphm.sql.engines.spark.expression.function.scalar.string.Md5;
 import com.luanphm.sql.engines.spark.expression.function.util.SqlFunctionRegistryUtil;
 import org.elasticsearch.xpack.ql.expression.function.FunctionDefinition;
 import org.elasticsearch.xpack.sql.expression.function.SqlFunctionRegistry;
+import org.elasticsearch.xpack.sql.expression.predicate.conditional.Coalesce;
 
 /**
  * @author Minh-Luan H. Phan
@@ -18,7 +20,8 @@ public class SparkSqlFunctionRegistry extends SqlFunctionRegistry {
                 new FunctionDefinition[][] {
                         // String
                         new FunctionDefinition[] {
-                                def(Md5.class, Md5::new, "MD5")
+                                def(Md5.class, Md5::new, "MD5"),
+                                def(EnhancedConcat.class, EnhancedConcat::new, "ENHANCED_CONCAT"),
                         }
                 }
         );

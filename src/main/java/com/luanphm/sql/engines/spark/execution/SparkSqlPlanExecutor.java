@@ -1,7 +1,6 @@
 package com.luanphm.sql.engines.spark.execution;
 
 import com.luanphm.sql.engines.spark.expression.function.SparkSqlFunctionRegistry;
-import com.luanphm.sql.util.StackTraceUtil;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.io.stream.NamedWriteableRegistry;
 import org.elasticsearch.xpack.ql.index.IndexResolver;
@@ -20,7 +19,5 @@ public class SparkSqlPlanExecutor extends PlanExecutor {
                 writeableRegistry,
                 new SparkSqlFunctionRegistry()
         );
-
-        StackTraceUtil.printStackTrace("new SparkSqlPlanExecutor");
     }
 }
