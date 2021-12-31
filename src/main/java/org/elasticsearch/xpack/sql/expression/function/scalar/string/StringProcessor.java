@@ -72,7 +72,12 @@ public class StringProcessor implements Processor {
         CHAR_LENGTH(String::length),
 
         // Custom
-        MD5(AdditionalStringFunctionUtils::md5)
+        MD5(AdditionalStringFunctionUtils::md5),
+        BASE64(AdditionalStringFunctionUtils::base64),
+        UNBASE64(AdditionalStringFunctionUtils::unbase64),
+        CRC32(AdditionalStringFunctionUtils::crc32),
+        SHA1(AdditionalStringFunctionUtils::sha1),
+        SHA256(AdditionalStringFunctionUtils::sha256),
         ;
 
         private final Function<Object, Object> apply;

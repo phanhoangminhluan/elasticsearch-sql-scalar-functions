@@ -6,7 +6,7 @@ package com.luanphm.sql.enums;
  */
 public enum DatabaseEngine {
 
-    SPARK("spark");
+    CDP("cdp");
 
     public final String name;
 

@@ -41,7 +41,7 @@ public abstract class ThreeArgsDateTimePipe extends Pipe {
         return third;
     }
 
-    ZoneId zoneId() {
+    protected ZoneId zoneId() {
         return zoneId;
     }
 

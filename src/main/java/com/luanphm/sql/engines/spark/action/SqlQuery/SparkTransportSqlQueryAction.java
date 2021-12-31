@@ -5,6 +5,7 @@ import com.luanphm.sql.engines.spark.execution.SparkSqlPlanExecutor;
 import com.luanphm.sql.enums.ActionEngine;
 import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.cluster.service.ClusterService;
+import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
@@ -18,6 +19,7 @@ public class SparkTransportSqlQueryAction extends AbstractTransportSqlQueryActio
 
     public static final ActionEngine ACTION_ENGINE = ActionEngine.SPARK;
 
+    @Inject
     public SparkTransportSqlQueryAction(
             Settings settings,
             ClusterService clusterService,

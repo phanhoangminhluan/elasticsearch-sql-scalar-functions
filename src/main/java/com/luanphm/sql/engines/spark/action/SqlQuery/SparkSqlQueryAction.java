@@ -10,7 +10,7 @@ import com.luanphm.sql.enums.DatabaseEngine;
 public class SparkSqlQueryAction extends AbstractSqlQueryAction {
 
     public SparkSqlQueryAction() {
-        super(DatabaseEngine.SPARK.name);
+        super(DatabaseEngine.CDP.name);
     }
 
 }

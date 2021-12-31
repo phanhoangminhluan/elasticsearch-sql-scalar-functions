@@ -53,7 +53,7 @@ public abstract class ThreeArgsDateTimeProcessor implements Processor {
         return third;
     }
 
-    ZoneId zoneId() {
+    protected ZoneId zoneId() {
         return zoneId;
     }
 

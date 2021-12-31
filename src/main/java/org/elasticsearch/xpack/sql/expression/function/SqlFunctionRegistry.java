@@ -191,13 +191,16 @@ public class SqlFunctionRegistry extends FunctionRegistry {
             // Date
             new FunctionDefinition[]{
                 def(CurrentDate.class, CurrentDate::new, "CURRENT_DATE", "CURDATE", "TODAY"),
+//                def(CurrentDate.class, CurrentDate::new, "CURDATE", "TODAY"),
                 def(CurrentTime.class, CurrentTime::new, "CURRENT_TIME", "CURTIME"),
                 def(CurrentDateTime.class, CurrentDateTime::new, "CURRENT_TIMESTAMP", "NOW"),
+//                def(CurrentDateTime.class, CurrentDateTime::new, "NOW"),
                 def(DayName.class, DayName::new, "DAY_NAME", "DAYNAME"),
                 def(DayOfMonth.class, DayOfMonth::new, "DAY_OF_MONTH", "DAYOFMONTH", "DAY", "DOM"),
                 def(DayOfWeek.class, DayOfWeek::new, "DAY_OF_WEEK", "DAYOFWEEK", "DOW"),
                 def(DayOfYear.class, DayOfYear::new, "DAY_OF_YEAR", "DAYOFYEAR", "DOY"),
                 def(DateAdd.class, DateAdd::new, "DATEADD", "DATE_ADD", "TIMESTAMPADD", "TIMESTAMP_ADD"),
+//                def(DateAdd.class, DateAdd::new, "TIMESTAMPADD", "TIMESTAMP_ADD"),
                 def(DateDiff.class, DateDiff::new, "DATEDIFF", "DATE_DIFF", "TIMESTAMPDIFF", "TIMESTAMP_DIFF"),
                 def(DateParse.class, DateParse::new, "DATE_PARSE"),
                 def(DatePart.class, DatePart::new, "DATEPART", "DATE_PART"),
@@ -208,7 +211,7 @@ public class SqlFunctionRegistry extends FunctionRegistry {
                 def(ToChar.class, ToChar::new, "TO_CHAR"),
                 def(HourOfDay.class, HourOfDay::new, "HOUR_OF_DAY", "HOUR"),
                 def(IsoDayOfWeek.class, IsoDayOfWeek::new, "ISO_DAY_OF_WEEK", "ISODAYOFWEEK", "ISODOW", "IDOW"),
-                def(IsoWeekOfYear.class, IsoWeekOfYear::new, "ISO_WEEK_OF_YEAR", "ISOWEEKOFYEAR", "ISOWEEK", "IWOY", "IW"),
+//                def(IsoWeekOfYear.class, IsoWeekOfYear::new, "ISO_WEEK_OF_YEAR", "ISOWEEKOFYEAR", "ISOWEEK", "IWOY", "IW"),
                 def(MinuteOfDay.class, MinuteOfDay::new, "MINUTE_OF_DAY"),
                 def(MinuteOfHour.class, MinuteOfHour::new, "MINUTE_OF_HOUR", "MINUTE"),
                 def(MonthName.class, MonthName::new, "MONTH_NAME", "MONTHNAME"),
@@ -217,7 +220,7 @@ public class SqlFunctionRegistry extends FunctionRegistry {
                 def(TimeParse.class, TimeParse::new, "TIME_PARSE"),
                 def(Quarter.class, Quarter::new, "QUARTER"),
                 def(Year.class, Year::new, "YEAR"),
-                def(WeekOfYear.class, WeekOfYear::new, "WEEK_OF_YEAR", "WEEK")
+//                def(WeekOfYear.class, WeekOfYear::new, "WEEK_OF_YEAR", "WEEK")
             },
             // Math
             new FunctionDefinition[]{

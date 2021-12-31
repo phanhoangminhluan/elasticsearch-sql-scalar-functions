@@ -10,6 +10,6 @@ import com.luanphm.sql.enums.DatabaseEngine;
 public class SparkSqlClearCursorAction extends AbstractSqlClearCursorAction {
 
     public SparkSqlClearCursorAction() {
-        super(DatabaseEngine.SPARK.name);
+        super(DatabaseEngine.CDP.name);
     }
 }

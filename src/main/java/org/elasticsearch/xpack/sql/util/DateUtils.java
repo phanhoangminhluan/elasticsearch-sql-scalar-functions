@@ -25,10 +25,13 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
 import java.time.temporal.TemporalAccessor;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
+import static java.time.temporal.ChronoField.*;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
 
 public final class DateUtils {
 
@@ -49,6 +52,22 @@ public final class DateUtils {
             .append(ISO_LOCAL_TIME_OPTIONAL_TZ)
             .optionalEnd()
             .toFormatter().withZone(UTC);
+
+    public static final DateTimeFormatter ES_LOCAL_DATE_TIME = new DateTimeFormatterBuilder()
+            .append(ISO_LOCAL_DATE)
+            .optionalStart()
+            .appendLiteral(' ')
+            .appendValue(HOUR_OF_DAY, 2)
+            .appendLiteral(':')
+            .appendValue(MINUTE_OF_HOUR, 2)
+            .optionalStart()
+            .appendLiteral(':')
+            .appendValue(SECOND_OF_MINUTE, 2)
+            .optionalStart()
+            .appendFraction(NANO_OF_SECOND, 0, 3, true)
+            .optionalEnd()
+            .toFormatter();
+
     private static final DateTimeFormatter ISO_LOCAL_DATE_OPTIONAL_TIME_FORMATTER_T_LITERAL = new DateTimeFormatterBuilder()
             .append(ISO_LOCAL_DATE)
             .optionalStart()
@@ -147,6 +166,12 @@ public final class DateUtils {
         return date.format(ISO_LOCAL_DATE);
     }
 
+    public static String convertZonedDateTimeToFormat(ZonedDateTime date, String timeZone, DateTimeFormatter dtf) {
+        if (date == null) return null;
+        if (timeZone == null) return null;
+        return dtf.withZone(ZoneId.of(timeZone)).format(date);
+    }
+
     public static String toTimeString(OffsetTime time) {
         return StringUtils.toString(time);
     }
@@ -168,6 +193,7 @@ public final class DateUtils {
                 throw new ParsingException(precisionExpression.source(), "invalid precision; " + e.getMessage());
             }
         }
+
 
         if (precision < 0 || precision > 9) {
             throw new ParsingException(precisionExpression.source(), "precision needs to be between [0-9], received [{}]",

@@ -19,7 +19,7 @@ import org.elasticsearch.xpack.sql.proto.Protocol;
 public enum SqlQuery {
 
     SPARK(
-            DatabaseEngine.SPARK.name,
+            DatabaseEngine.CDP.name,
             new SparkSqlQueryAction(),
             new SparkRestSqlQueryAction(),
             SparkTransportSqlQueryAction.class

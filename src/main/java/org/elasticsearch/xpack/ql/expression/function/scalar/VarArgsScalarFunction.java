@@ -23,7 +23,7 @@ public abstract class VarArgsScalarFunction extends ScalarFunction{
     }
 
     @Override
-    public abstract VarArgsScalarFunction replaceChildren(List<Expression> newChildren)
+    public abstract VarArgsScalarFunction replaceChildren(List<Expression> newChildren);
 
     @Override
     protected NodeInfo<? extends Expression> info() {

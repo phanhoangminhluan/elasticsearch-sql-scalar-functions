@@ -19,7 +19,7 @@ import org.elasticsearch.xpack.sql.proto.Protocol;
 public enum SqlClearCursor {
 
     SPARK(
-            DatabaseEngine.SPARK.name,
+            DatabaseEngine.CDP.name,
             new SparkSqlClearCursorAction(),
             new SparkRestSqlClearCursorAction(),
             SparkTransportSqlClearCursorAction.class
