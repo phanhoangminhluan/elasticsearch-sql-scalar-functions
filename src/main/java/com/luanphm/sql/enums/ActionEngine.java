@@ -14,7 +14,7 @@ import org.elasticsearch.xpack.sql.execution.PlanExecutor;
 public enum ActionEngine {
 
     SPARK(
-            DatabaseEngine.CDP.name,
+            DatabaseEngine.SPARK.name,
             SqlQuery.SPARK,
             SqlClearCursor.SPARK,
             SparkSqlPlanExecutor::new

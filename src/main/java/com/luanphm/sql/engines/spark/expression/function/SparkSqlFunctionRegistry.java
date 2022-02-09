@@ -26,14 +26,16 @@ public class SparkSqlFunctionRegistry extends SqlFunctionRegistry {
                 new FunctionDefinition[][] {
                         // String
                         new FunctionDefinition[] {
+                                // select CDP_MD5('a')
                                 def(Md5.class, Md5::new, "CDP_MD5"),
                                 def(Base64.class, Base64::new, "BASE64"),
                                 def(Unbase64.class, Unbase64::new, "UNBASE64"),
                                 def(Crc32.class, Crc32::new, "CDP_CRC32"),
                                 def(Sha1.class, Sha1::new, "SHA1"),
                                 def(Sha256.class, Sha256::new, "CDP_SHA256"),
+                                def(InfiniteConcat.class, InfiniteConcat::new, "dcm"),
 
-                                def(EnhancedConcat.class, EnhancedConcat::new, "ENHANCED_CONCAT"),
+//                                def(EnhancedConcat.class, EnhancedConcat::new, "ENHANCED_CONCAT"),
                         },
 
                         // Date
